@@ -1,5 +1,4 @@
 import art
-import os
 
 print(art.logo)
 bids = {}
