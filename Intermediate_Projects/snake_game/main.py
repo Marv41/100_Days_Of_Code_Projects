@@ -33,7 +33,8 @@ while game_running:
         scoreboard.add_to_score()
 
     if wall_collision or self_collision:
-        game_running = False
+        scoreboard.reset()
+        snake.reset()
     else:
         snake.move()
 
@@ -42,5 +43,4 @@ while game_running:
     screen.onkeypress(fun=snake.right, key="Right")
     screen.onkeypress(fun=snake.left, key="Left")
 
-scoreboard.game_over()
 screen.exitonclick()
