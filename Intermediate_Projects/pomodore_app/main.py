@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import Label
 
-
 # ---------------------------- CONSTANTS ------------------------------- #
 PINK = "#e2979c"
 RED = "#e7305b"
