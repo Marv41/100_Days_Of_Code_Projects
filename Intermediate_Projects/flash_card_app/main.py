@@ -1,56 +1,77 @@
 from tkinter import *
+import pandas
+import random
+
+from pandas.core.interchange.dataframe_protocol import DataFrame
+
+from Easy_Projects.hangman_game.hangman_words import word_list
 
 BACKGROUND_COLOR = "#B1DDC6"
-count_down_time = 3
-timer = None
+timer_ms = 3000
+file = "data/french_words.csv"
+language = "French"
+to_learn = {}
+current_card = {}
 
-#Change card image and update text after 3 seconds
+#import csv
+try:
+    df = pandas.read_csv("words_to_learn.csv")
+except FileNotFoundError:
+    df = pandas.read_csv(file)
+    to_learn = df.to_dict(orient="records")
+else:
+    to_learn = df.to_dict(orient="records")
 
-def count_down(count):
-    global timer
 
-    if count > 0:
-        timer = window.after(1000, count_down, count - 1)
+def flip_card():
+    canvas.itemconfig(card, image=card_back)
+    canvas.itemconfig(card_title, text="English", fill="white")
+    canvas.itemconfig(card_word, text=current_card["English"], fill="white")
+
+def next_card():
+    global current_card, flip_timer
+    window.after_cancel(flip_timer)
+    try:
+        current_card = random.choice(to_learn)
+    except IndexError:
+        canvas.itemconfig(card_word, text="END")
     else:
         canvas.itemconfig(card, image=card_front)
-        canvas.itemconfig(card_text, text="English Translation")
+        canvas.itemconfig(card_title, text=language, fill="black")
+        canvas.itemconfig(card_word, text=current_card[language], fill="black")
+        flip_timer = window.after(timer_ms, flip_card)
 
-def right_answer():
-    canvas.itemconfig(card, image=card_back)
-    canvas.itemconfig(card_text, text="next spanish word")
-    count_down(count_down_time)
+def correct():
+    to_learn.remove(current_card)
+    data = pandas.DataFrame(word_list)
+    data.to_csv("data/words_to_learn.csv", index=False)
+    next_card()
 
-def wrong_answer():
-    canvas.itemconfig(card, image=card_back)
-    canvas.itemconfig(card_text, text="next spanish word")
-    count_down(count_down_time)
-
-
-
+#GUI
 window = Tk()
 window.title("Flashy")
+window.config(bg=BACKGROUND_COLOR, padx=50, pady=50)
+flip_timer = window.after(timer_ms, flip_card)
 
-
-canvas = Canvas(width=900, height=726, bg=BACKGROUND_COLOR)
-canvas.pack()
-
+canvas = Canvas(width=800, height=526, bg=BACKGROUND_COLOR, highlightthickness=0)
 card_back = PhotoImage(file="images/card_back.png")
 card_front = PhotoImage(file="images/card_front.png")
+card = canvas.create_image(400, 263, image=card_front)
+canvas.grid(row=0, column=0, columnspan=2)
+
 wrong = PhotoImage(file="images/wrong.png")
+wrong_button = Button(image=wrong, command=next_card, highlightthickness=0)
+wrong_button.grid(column=0, row=1)
+
 right = PhotoImage(file="images/right.png")
+right_button = Button(image=right, command=correct, highlightthickness=0)
+right_button.grid(column=1, row=1)
 
-card = canvas.create_image(450, 313, image=card_back)
+card_title = canvas.create_text(400, 150, text="", font=("Ariel", 40, "italic"))
+card_word = canvas.create_text(400, 263, text="", font=("Ariel", 40, "bold"))
 
-wrong_button = Button(image=wrong, command=wrong_answer)
-canvas.create_window(200, 651, window=wrong_button)
+#Start main function
+next_card()
 
-right_button = Button(image=right, command=right_answer)
-canvas.create_window(700, 651, window=right_button)
-
-card_text = canvas.create_text(450, 313, text="Spanish Word")
-
-
-
-count_down(count_down_time)
 
 window.mainloop()
