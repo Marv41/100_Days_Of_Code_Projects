@@ -1,6 +1,4 @@
 from tkinter import *
-from tkinter import Label
-
 
 # ---------------------------- CONSTANTS ------------------------------- #
 PINK = "#e2979c"
@@ -41,7 +39,6 @@ def count_down(count):
     fsec = count % 60
     fmin = count // 60
     canvas.itemconfig(timer_text, text=f"{fmin}:{fsec:02d}")
-    # canvas.itemconfig(timer_text, text=f"{count}")
     if count > 0:
         global timer
         timer = window.after(1000, count_down, count - 1)
