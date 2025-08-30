@@ -1,6 +1,3 @@
-
-
-
 with open("./input/names/invited_names.txt", mode="r") as names:
     names = names.readlines()
 
